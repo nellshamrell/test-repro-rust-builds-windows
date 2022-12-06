@@ -1,12 +1,12 @@
-function FirstBuild {
+function FirstBuild($AdditionalArgs) {
     # This environmental variable needs to reset everytime a build is run in a new directory
     $Env:RUSTFLAGS = "--remap-path-prefix=${PWD}=app -Clink-arg=/experimental:deterministic"
 
     Write-Output 'Build to generate Cargo.lock file'
-    cargo build --release --package=windows --target=x86_64-pc-windows-msvc 
+    cargo build --release $AdditionalArgs --target=x86_64-pc-windows-msvc 
 
     Write-Output 'Build with locked Cargo.lock file'
-    cargo build --release --locked --package=windows --target=x86_64-pc-windows-msvc 
+    cargo build --release --locked $AdditionalArgs --target=x86_64-pc-windows-msvc 
 }
 
 function SecondBuild {
@@ -15,6 +15,19 @@ function SecondBuild {
 
     Write-Output 'Build with locked Cargo.lock file'
     cargo build --release --locked --package=windows --target=x86_64-pc-windows-msvc 
+}
+
+function ExecutableTests {
+    Write-Output '======================='
+    Write-Output 'Executable Tests'
+    Write-Output '======================='
+    Write-Output 'Testing exe reproducibility using https://github.com/nellshamrell/reproducible_build_basic_exp.git'
+    Set-Location first_builds
+    git clone https://github.com/nellshamrell/reproducible_build_basic_exp.git
+    Set-Location reproducible_build_basic_exp
+
+
+ 
 }
 
 function RLibTests { 
@@ -29,7 +42,7 @@ function RLibTests {
     git clone https://github.com/microsoft/windows-rs.git
     Set-Location windows-rs
 
-    FirstBuild
+    FirstBuild -AdditionalArgs "--package=windows"
 
     Write-Output 'Getting file hashes...'
     Write-Output 'libwindows.d (first build)'
