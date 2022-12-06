@@ -1,10 +1,21 @@
-# SET UP
-Write-Output 'Running Windows Rust Reproducible Build Tests'
-Write-Output 'Getting Rust version...'
-rustc --version
+function Run-FirstBuild {
+    # This environmental variable needs to reset everytime a build is run in a new directory
+    $Env:RUSTFLAGS = "--remap-path-prefix=${PWD}=app -Clink-arg=/experimental:deterministic"
 
-mkdir first_builds
-mkdir second_builds
+    Write-Output 'Build to generate Cargo.lock file'
+    cargo build --release --package=windows --target=x86_64-pc-windows-msvc 
+
+    Write-Output 'Build with locked Cargo.lock file'
+    cargo build --release --locked --package=windows --target=x86_64-pc-windows-msvc 
+}
+
+function Run-SecondBuild {
+    # This environmental variable needs to reset everytime a build is run in a new directory
+    $Env:RUSTFLAGS = "--remap-path-prefix=${PWD}=app -Clink-arg=/experimental:deterministic"
+
+    Write-Output 'Build with locked Cargo.lock file'
+    cargo build --release --locked --package=windows --target=x86_64-pc-windows-msvc 
+}
 
 function Run-RLibTests { 
     # RLib Tests
@@ -19,13 +30,7 @@ function Run-RLibTests {
     git clone https://github.com/microsoft/windows-rs.git
     Set-Location windows-rs
 
-    $Env:RUSTFLAGS = "--remap-path-prefix=${PWD}=app -Clink-arg=/experimental:deterministic"
-
-    Write-Output 'Build to generate Cargo.lock file'
-    cargo build --release --package=windows --target=x86_64-pc-windows-msvc 
-
-    Write-Output 'Build with locked Cargo.lock file'
-    cargo build --release --locked --package=windows --target=x86_64-pc-windows-msvc 
+    Run-FirstBuild
 
     Write-Output 'Getting file hashes...'
     Write-Output 'libwindows.d (first build)'
@@ -46,10 +51,7 @@ function Run-RLibTests {
     Copy-Item ../first_builds/windows-rs/Cargo.lock windows-rs
     Set-Location windows-rs
 
-    $Env:RUSTFLAGS = "--remap-path-prefix=${PWD}=app -Clink-arg=/experimental:deterministic"
-
-    Write-Output 'Build with locked Cargo.lock file'
-    cargo build --release --locked --package=windows --target=x86_64-pc-windows-msvc 
+    Run-SecondBuild
 
     Write-Output 'Getting file hashes...'
 
