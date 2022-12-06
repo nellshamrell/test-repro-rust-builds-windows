@@ -25,9 +25,64 @@ function ExecutableTests {
     Set-Location first_builds
     git clone https://github.com/nellshamrell/reproducible_build_basic_exp.git
     Set-Location reproducible_build_basic_exp
+    FirstBuild
 
+    Write-Output 'Getting file hashes...'
+    'reproducible_build_basic_exp.d (first build)'
+    $DFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\reproducible_build_basic_exp.d
+    Write-Output $DFirstBuild.Hash
+    Write-Output ''
 
+    Write-Output 'reproducible_build_basic_exp.exe (first build)'
+    $ExeFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\reproducible_build_basic_exp.exe
+    Write-Output $ExeFirstBuild.Hash
+    Write-Output ''
+
+    Write-Output 'reproducible_build_basic_exp.pdb (first build)'
+    $PdbFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\reproducible_build_basic_exp.pdb
+    Write-Output $PdbFirstBuild.Hash
+
+    Write-Output ''
+
+    Write-Output 'Creating second build from a different directory...'
+    Set-Location ../../second_builds
+    git clone https://github.com/nellshamrell/reproducible_build_basic_exp.git
  
+    Write-Output 'Copying Cargo.lock from first build to make sure we use the same one'
+    Copy-Item ../first_builds/reproducible_build_basic_exp/Cargo.lock reproducible_build_basic_exp
+    Set-Location reproducible_build_basic_exp
+
+    SecondBuild
+
+    Write-Output 'Getting file hashes...'
+    'reproducible_build_basic_exp.d (first build)'
+    $DSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\reproducible_build_basic_exp.d
+    Write-Output $DSecondBuild.Hash
+    Write-Output ''
+
+    Write-Output 'reproducible_build_basic_exp.exe (first build)'
+    $ExeSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\reproducible_build_basic_exp.exe
+    Write-Output $ExeSecondBuild.Hash
+    Write-Output ''
+
+    Write-Output 'reproducible_build_basic_exp.pdb (first build)'
+    $PdbSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\reproducible_build_basic_exp.pdb
+    Write-Output $PdbSecondBuild.Hash
+
+    Write-Output ''
+    Write-Output 'reproducible_build_basic_exp.d reproducible?'
+    $DReproducible = $DFirstBuild.Hash -eq $DSecondBuild.Hash
+    Write-Output $DReproducible
+
+    Write-Output ''
+    Write-Output 'reproducible_build_basic_exp.exe reproducible?'
+    $ExeReproducible = $ExeFirstBuild.Hash -eq $ExeSecondBuild.Hash
+    Write-Output $ExeReproducible
+
+    Write-Output ''
+    Write-Output 'reproducible_build_basic_exp.exe reproducible?'
+    $PdbReproducible = $PdbFirstBuild.Hash -eq $PdbSecondBuild.Hash
+    Write-Output $PdbReproducible
 }
 
 function RLibTests { 
@@ -63,7 +118,7 @@ function RLibTests {
     Copy-Item ../first_builds/windows-rs/Cargo.lock windows-rs
     Set-Location windows-rs
 
-    SecondBuild
+    SecondBuild -AdditionalArgs "--package=windows"
 
     Write-Output 'Getting file hashes...'
 
@@ -94,7 +149,8 @@ rustc --version
 mkdir first_builds
 mkdir second_builds
 
-RLibTests
+#RLibTests
+ExecutableTests
 
 # CLEAN UP
 Set-Location ../..
