@@ -63,6 +63,14 @@ function RLibTests {
     Write-Output $RlibSecondBuild.Hash
 
     Write-Output ''
+    Write-Output 'libwindows.d reproducible?'
+    $DReproducible = $DFirstBuild.Hash -eq $DSecondBuild.Hash
+    Write-Output $DReproducible
+
+    Write-Output ''
+    Write-Output 'libwindows.rlib reproducible?'
+    $RLibReproducible = $RlibFirstBuild.Hash -eq $RlibSecondBuild.Hash
+    Write-Output $RLibReproducible
 }
 
 # SET UP
