@@ -1,4 +1,4 @@
-function Run-FirstBuild {
+function FirstBuild {
     # This environmental variable needs to reset everytime a build is run in a new directory
     $Env:RUSTFLAGS = "--remap-path-prefix=${PWD}=app -Clink-arg=/experimental:deterministic"
 
@@ -9,7 +9,7 @@ function Run-FirstBuild {
     cargo build --release --locked --package=windows --target=x86_64-pc-windows-msvc 
 }
 
-function Run-SecondBuild {
+function SecondBuild {
     # This environmental variable needs to reset everytime a build is run in a new directory
     $Env:RUSTFLAGS = "--remap-path-prefix=${PWD}=app -Clink-arg=/experimental:deterministic"
 
@@ -17,8 +17,7 @@ function Run-SecondBuild {
     cargo build --release --locked --package=windows --target=x86_64-pc-windows-msvc 
 }
 
-function Run-RLibTests { 
-    # RLib Tests
+function RLibTests { 
     Write-Output '======================='
     Write-Output 'RLib Tests'
     Write-Output '======================='
@@ -30,7 +29,7 @@ function Run-RLibTests {
     git clone https://github.com/microsoft/windows-rs.git
     Set-Location windows-rs
 
-    Run-FirstBuild
+    FirstBuild
 
     Write-Output 'Getting file hashes...'
     Write-Output 'libwindows.d (first build)'
@@ -51,7 +50,7 @@ function Run-RLibTests {
     Copy-Item ../first_builds/windows-rs/Cargo.lock windows-rs
     Set-Location windows-rs
 
-    Run-SecondBuild
+    SecondBuild
 
     Write-Output 'Getting file hashes...'
 
@@ -74,7 +73,7 @@ rustc --version
 mkdir first_builds
 mkdir second_builds
 
-Run-RLibTests
+RLibTests
 
 # CLEAN UP
 Set-Location ../..
