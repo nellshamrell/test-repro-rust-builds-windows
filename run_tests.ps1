@@ -88,6 +88,8 @@ function ExecutableTests {
 
     Write-Output 'reproducible_build_basic_exp.pdb reproducible?'
     Write-Output $PdbReproducible
+
+    Set-Location ../..
 }
 
 function RLibTests { 
@@ -150,6 +152,14 @@ function RLibTests {
     Write-Output ''
     Write-Output 'libwindows.rlib reproducible?'
     Write-Output $RLibReproducible
+
+    # Write results to file
+    "-------------`nRLib Test Results" | Out-File -FilePath ..\..\test_results.txt -Append
+    "Tested using https://github.com/microsoft/windows-rs/tree/master/crates/libs/windows`n"  | Out-File -FilePath ..\..\test_results.txt -Append
+    "libwindows.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "libwindows.rlib reproducible? ${RLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+
+    Set-Location ../..
 }
 
 # SET UP
@@ -157,15 +167,18 @@ Write-Output 'Running Windows Rust Reproducible Build Tests'
 Write-Output 'Getting Rust version...'
 rustc --version
 
+# Create directories to run tests in
 mkdir first_builds
 mkdir second_builds
 
-ExecutableTests
-Set-Location ../..
+# Create file to write results to
+New-Item -Path . -Name 'test_results.txt' -ItemType "file" -Value "Test Results`n"
+
+# Run tests
+#ExecutableTests
 
 RLibTests
 
 # CLEAN UP
-Set-Location ../..
 Remove-Item -LiteralPath "first_builds" -Force -Recurse
 Remove-Item -LiteralPath "second_builds" -Force -Recurse
