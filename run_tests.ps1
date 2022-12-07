@@ -89,6 +89,13 @@ function ExecutableTests {
     Write-Output 'reproducible_build_basic_exp.pdb reproducible?'
     Write-Output $PdbReproducible
 
+    # Write results to file
+    "-------------`nExe Test Results" | Out-File -FilePath ..\..\test_results.txt -Append
+    "Tested using https://github.com/nellshamrell/reproducible_build_basic_exp`n"  | Out-File -FilePath ..\..\test_results.txt -Append
+    "reproducible_build_basic_exp.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "reproducible_build_basic_exp.exe reproducible? ${ExeReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "reproducible_build_basic_exp.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
+
     Set-Location ../..
 }
 
@@ -175,7 +182,7 @@ mkdir second_builds
 New-Item -Path . -Name 'test_results.txt' -ItemType "file" -Value "Test Results`n"
 
 # Run tests
-#ExecutableTests
+ExecutableTests
 
 RLibTests
 
