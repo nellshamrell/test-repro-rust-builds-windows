@@ -54,26 +54,39 @@ function ExecutableTests {
     Write-Output $DFirstBuild.Hash
     Write-Output 'reproducible_build_basic_exp.d (second build)'
     Write-Output $DSecondBuild.Hash
-    Write-Output 'reproducible_build_basic_exp.d reproducible?'
     $DReproducible = $DFirstBuild.Hash -eq $DSecondBuild.Hash
-    Write-Output $DReproducible
+
     Write-Output ''
 
     Write-Output 'reproducible_build_basic_exp.exe (first build)'
     Write-Output $ExeFirstBuild.Hash
     Write-Output 'reproducible_build_basic_exp.exe (first build)'
     Write-Output $ExeSecondBuild.Hash
-    Write-Output ''
-    Write-Output 'reproducible_build_basic_exp.exe reproducible?'
     $ExeReproducible = $ExeFirstBuild.Hash -eq $ExeSecondBuild.Hash
-    Write-Output $ExeReproducible
+
+    Write-Output ''
 
     Write-Output 'reproducible_build_basic_exp.pdb (first build)'
     Write-Output $PdbFirstBuild.Hash
     Write-Output 'reproducible_build_basic_exp.pdb (second build)'
     Write-Output $PdbSecondBuild.Hash
-    Write-Output 'reproducible_build_basic_exp.pdb reproducible?'
     $PdbReproducible = $PdbFirstBuild.Hash -eq $PdbSecondBuild.Hash
+
+    Write-Output ''
+
+    Write-Output '======================='
+    Write-Output 'Executable Test Results'
+    Write-Output '======================='
+
+    Write-Output 'reproducible_build_basic_exp.d reproducible?'
+    Write-Output $DReproducible
+    Write-Output ''
+
+    Write-Output 'reproducible_build_basic_exp.exe reproducible?'
+    Write-Output $ExeReproducible
+    Write-Output ''
+
+    Write-Output 'reproducible_build_basic_exp.pdb reproducible?'
     Write-Output $PdbReproducible
 }
 
@@ -91,14 +104,8 @@ function RLibTests {
 
     FirstBuild -AdditionalArgs "--package=windows"
 
-    Write-Output 'Getting file hashes...'
-    Write-Output 'libwindows.d (first build)'
     $DFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\libwindows.d
-    Write-Output $DFirstBuild.Hash
-    Write-Output ''
-    Write-Output 'libwindows.rlib (first build)'
     $RlibFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\libwindows.rlib
-    Write-Output $RlibFirstBuild.Hash
 
     Write-Output ''
 
@@ -114,22 +121,34 @@ function RLibTests {
 
     Write-Output 'Getting file hashes...'
 
-    Write-Output 'libwindows.d (second build)'
     $DSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\libwindows.d
-    Write-Output $DSecondBuild.Hash
-    Write-Output ''
-    Write-Output 'libwindows.rlib (second build)'
     $RlibSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\libwindows.rlib
+
+    Write-Output 'libwindows.d (first build)'
+    Write-Output $DFirstBuild.Hash
+    Write-Output 'libwindows.d (second build)'
+    Write-Output $DSecondBuild.Hash
+    $DReproducible = $DFirstBuild.Hash -eq $DSecondBuild.Hash
+
+    Write-Output ''
+
+    Write-Output 'libwindows.rlib (first build)'
+    Write-Output $RlibFirstBuild.Hash
+    Write-Output 'libwindows.rlib (second build)'
     Write-Output $RlibSecondBuild.Hash
+    $RLibReproducible = $RlibFirstBuild.Hash -eq $RlibSecondBuild.Hash
+
+
+    Write-Output '======================='
+    Write-Output 'RLib Test Results'
+    Write-Output '======================='
 
     Write-Output ''
     Write-Output 'libwindows.d reproducible?'
-    $DReproducible = $DFirstBuild.Hash -eq $DSecondBuild.Hash
     Write-Output $DReproducible
 
     Write-Output ''
     Write-Output 'libwindows.rlib reproducible?'
-    $RLibReproducible = $RlibFirstBuild.Hash -eq $RlibSecondBuild.Hash
     Write-Output $RLibReproducible
 }
 
@@ -141,8 +160,10 @@ rustc --version
 mkdir first_builds
 mkdir second_builds
 
-#RLibTests
 ExecutableTests
+Set-Location ../..
+
+RLibTests
 
 # CLEAN UP
 Set-Location ../..
