@@ -90,7 +90,7 @@ function ExecutableTests {
     Write-Output $PdbReproducible
 
     # Write results to file
-    "-------------`nExe Test Results" | Out-File -FilePath ..\..\test_results.txt -Append
+    "Exe Test Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
     "Tested using https://github.com/nellshamrell/reproducible_build_basic_exp`n"  | Out-File -FilePath ..\..\test_results.txt -Append
     "reproducible_build_basic_exp.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
     "reproducible_build_basic_exp.exe reproducible? ${ExeReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
@@ -161,7 +161,7 @@ function RLibTests {
     Write-Output $RLibReproducible
 
     # Write results to file
-    "-------------`nRLib Test Results" | Out-File -FilePath ..\..\test_results.txt -Append
+    "RLib Test Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
     "Tested using https://github.com/microsoft/windows-rs/tree/master/crates/libs/windows`n"  | Out-File -FilePath ..\..\test_results.txt -Append
     "libwindows.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
     "libwindows.rlib reproducible? ${RLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
@@ -178,8 +178,15 @@ rustc --version
 mkdir first_builds
 mkdir second_builds
 
+# Check if results file already exists
+# If it does, delete it
+
+If (Test-Path -Path .\test_results.txt) {
+    Remove-Item -Path .\test_results.txt    
+}
+
 # Create file to write results to
-New-Item -Path . -Name 'test_results.txt' -ItemType "file" -Value "Test Results`n"
+New-Item -Path . -Name 'test_results.txt' -ItemType "file" -Value "Test Results`n`n"
 
 # Run tests
 ExecutableTests
