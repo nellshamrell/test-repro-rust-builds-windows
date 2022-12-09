@@ -164,7 +164,7 @@ function RLibTests {
     "RLib Test Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
     "Tested using https://github.com/microsoft/windows-rs/tree/master/crates/libs/windows`n"  | Out-File -FilePath ..\..\test_results.txt -Append
     "libwindows.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "libwindows.rlib reproducible? ${RLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "libwindows.rlib reproducible? ${RLibReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
 
     Set-Location ../..
 }
@@ -173,7 +173,7 @@ function StaticCdyLibTests {
     Write-Output '======================='
     Write-Output 'StaticLib/CdyLib Tests'
     Write-Output '======================='
-    Write-Output 'Testing exe reproducibility using https://github.com/rust-lang/regex/tree/b92ffd5471018419ec48dbdef32757424439f065/regex-capi'
+    Write-Output 'Testing staticlib/cdylib reproducibility using https://github.com/rust-lang/regex/tree/b92ffd5471018419ec48dbdef32757424439f065/regex-capi'
     Write-Output 'Creating first build...'
 
     Set-Location first_builds
@@ -246,16 +246,97 @@ function StaticCdyLibTests {
     $PdbReproducible = $PdbFirstBuild.Hash -eq $PdbSecondBuild.Hash
 
     # Write results to file
-    "StaticLib/CdyLibTest Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
+    "StaticLib/Cdy LibTest Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
     "Tested using https://github.com/rust-lang/regex/tree/b92ffd5471018419ec48dbdef32757424439f065/regex-capi"  | Out-File -FilePath ..\..\test_results.txt -Append
     "rure.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
     "rure.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
     "rure.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
     "rure.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
     "rure.lib reproducible? ${LibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "rure.pdb reproducible? ${PdbReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "rure.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
 
     Set-Location ../..
+}
+
+function DyLibTests {
+    Write-Output '======================='
+    Write-Output 'DyLib Tests'
+    Write-Output '======================='
+    Write-Output 'Testing dylib reproducibility using https://github.com/AndrewGaspar/rust-plugin-example/tree/master/plugin_a'
+    Write-Output 'Creating first build...'
+
+    Set-Location first_builds
+    git clone https://github.com/AndrewGaspar/rust-plugin-example.git
+    Set-Location rust-plugin-example
+
+    FirstBuild -AdditionalArgs "--package=plugin_a"
+
+    $DFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.d
+    $DllFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.dll
+    $DllExpFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.dll.exp
+    $DllLibFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.dll.lib
+    $PdbFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.pdb
+
+    Write-Output ''
+    Set-Location ../../second_builds
+
+    Write-Output 'Creating second build from a different directory...'
+    git clone https://github.com/AndrewGaspar/rust-plugin-example.git
+    Write-Output 'Copying Cargo.lock from first build to make sure we use the same one'
+    Copy-Item ../first_builds/rust-plugin-example/Cargo.lock rust-plugin-example
+    Set-Location rust-plugin-example
+
+    SecondBuild -AdditionalArgs "--package=plugin_a"
+
+    Write-Output 'Getting file hashes...'
+
+    $DSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.d
+    $DllSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.dll
+    $DllExpSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.dll.exp
+    $DllLibSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.dll.lib
+    $PdbSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\plugin_a.pdb
+
+    Write-Output 'plugin_a.d (first build)'
+    Write-Output $DFirstBuild.Hash
+    Write-Output 'plugin_a.d (second build)'
+    Write-Output $DSecondBuild.Hash
+    $DReproducible = $DFirstBuild.Hash -eq $DSecondBuild.Hash
+
+    Write-Output 'plugin_a.dll (first build)'
+    Write-Output $DllFirstBuild.Hash
+    Write-Output 'plugin_a.dll (second build)'
+    Write-Output $DllSecondBuild.Hash
+    $DllReproducible = $DllFirstBuild.Hash -eq $DllSecondBuild.Hash
+
+    Write-Output 'plugin_a.dll.exp (first build)'
+    Write-Output $DllExpFirstBuild.Hash
+    Write-Output 'plugin_a.dll.exp (second build)'
+    Write-Output $DllExpSecondBuild.Hash
+    $DllExpReproducible = $DllExpFirstBuild.Hash -eq $DllExpSecondBuild.Hash
+
+    Write-Output 'plugin_a.dll.lib (first build)'
+    Write-Output $DllLibFirstBuild.Hash
+    Write-Output 'plugin_.dll.lib (second build)'
+    Write-Output $DllLibSecondBuild.Hash
+    $DllLibReproducible = $DllLibFirstBuild.Hash -eq $DllLibSecondBuild.Hash
+
+    Write-Output 'plugin_a.pdb (first build)'
+    Write-Output $PdbFirstBuild.Hash
+    Write-Output 'plugin_a.pdb (second build)'
+    Write-Output $PdbSecondBuild.Hash
+    $PdbReproducible = $PdbFirstBuild.Hash -eq $PdbSecondBuild.Hash
+
+    # Write results to file
+    "DyLib Test Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
+    "Tested using https://github.com/AndrewGaspar/rust-plugin-example/tree/master/plugin_a"  | Out-File -FilePath ..\..\test_results.txt -Append
+    "plugin_a.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "plugin_a.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "plugin_a.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "plugin_a.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "plugin_a.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
+
+    Set-Location ../..
+
 }
 
 # SET UP
@@ -282,6 +363,7 @@ ExecutableTests
 
 #RLibTests
 StaticCdyLibTests
+DyLibTests
 
 # CLEAN UP
 Remove-Item -LiteralPath "first_builds" -Force -Recurse
