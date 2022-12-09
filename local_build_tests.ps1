@@ -2,11 +2,7 @@ function FirstBuild($AdditionalArgs) {
     # This environmental variable needs to reset everytime a build is run in a new directory
     $Env:RUSTFLAGS = "--remap-path-prefix=${PWD}=app -Clink-arg=/experimental:deterministic"
 
-    Write-Output 'Build to generate Cargo.lock file'
     cargo build --release $AdditionalArgs --target=x86_64-pc-windows-msvc 
-
-    Write-Output 'Build with locked Cargo.lock file'
-    cargo build --release --locked $AdditionalArgs --target=x86_64-pc-windows-msvc 
 }
 
 function SecondBuild($AdditionalArgs){
