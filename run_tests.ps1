@@ -169,6 +169,95 @@ function RLibTests {
     Set-Location ../..
 }
 
+function StaticCdyLibTests {
+    Write-Output '======================='
+    Write-Output 'StaticLib/CdyLib Tests'
+    Write-Output '======================='
+    Write-Output 'Testing exe reproducibility using https://github.com/rust-lang/regex/tree/b92ffd5471018419ec48dbdef32757424439f065/regex-capi'
+    Write-Output 'Creating first build...'
+
+    Set-Location first_builds
+    git clone https://github.com/rust-lang/regex.git
+    Set-Location regex
+
+    FirstBuild -AdditionalArgs "--package=rure"
+
+    $DFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.d
+    $DllFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.dll
+    $DllExpFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.dll.exp
+    $DllLibFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.dll.lib
+    $LibFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.lib
+    $PdbFirstBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.pdb
+
+    Write-Output ''
+    Set-Location ../../second_builds
+
+    Write-Output 'Creating second build from a different directory...'
+    git clone https://github.com/rust-lang/regex.git
+    Write-Output 'Copying Cargo.lock from first build to make sure we use the same one'
+    Copy-Item ../first_builds/regex/Cargo.lock regex
+    Set-Location regex
+ 
+    SecondBuild -AdditionalArgs "--package=rure"
+
+    Write-Output 'Getting file hashes...'
+
+    $DSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.d
+    $DllSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.dll
+    $DllExpSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.dll.exp
+    $DllLibSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.dll.lib
+    $LibSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.lib
+    $PdbSecondBuild = Get-FileHash .\target\x86_64-pc-windows-msvc\release\rure.pdb
+
+    Write-Output 'rure.d (first build)'
+    Write-Output $DFirstBuild.Hash
+    Write-Output 'rure.d (second build)'
+    Write-Output $DSecondBuild.Hash
+    $DReproducible = $DFirstBuild.Hash -eq $DSecondBuild.Hash
+
+    Write-Output 'rure.dll (first build)'
+    Write-Output $DllFirstBuild.Hash
+    Write-Output 'rure.dll (second build)'
+    Write-Output $DllSecondBuild.Hash
+    $DllReproducible = $DllFirstBuild.Hash -eq $DllSecondBuild.Hash
+
+    Write-Output 'rure.dll.exp (first build)'
+    Write-Output $DllExpFirstBuild.Hash
+    Write-Output 'rure.dll.exp (second build)'
+    Write-Output $DllExpSecondBuild.Hash
+    $DllExpReproducible = $DllExpFirstBuild.Hash -eq $DllExpSecondBuild.Hash
+
+    Write-Output 'rure.dll.lib (first build)'
+    Write-Output $DllLibFirstBuild.Hash
+    Write-Output 'rure.dll.lib (second build)'
+    Write-Output $DllLibSecondBuild.Hash
+    $DllLibReproducible = $DllLibFirstBuild.Hash -eq $DllLibSecondBuild.Hash
+
+    Write-Output 'rure.lib (first build)'
+    Write-Output $LibFirstBuild.Hash
+    Write-Output 'rure.lib (second build)'
+    Write-Output $LibSecondBuild.Hash
+    $LibReproducible = $LibFirstBuild.Hash -eq $LibSecondBuild
+
+    Write-Output 'rure.pdb (first build)'
+    Write-Output $PdbFirstBuild.Hash
+    Write-Output 'rure.pdb (second build)'
+    Write-Output $PdbSecondBuild.Hash
+    $PdbReproducible = $PdbFirstBuild.Hash -eq $PdbSecondBuild.Hash
+
+    # Write results to file
+    "StaticLib/CdyLibTest Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
+    "Tested using https://github.com/rust-lang/regex/tree/b92ffd5471018419ec48dbdef32757424439f065/regex-capi"  | Out-File -FilePath ..\..\test_results.txt -Append
+    "rure.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "rure.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "rure.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "rure.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "rure.lib reproducible? ${LibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "rure.pdb reproducible? ${PdbReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+
+    Set-Location ../..
+}
+
 # SET UP
 Write-Output 'Running Windows Rust Reproducible Build Tests'
 Write-Output 'Getting Rust version...'
@@ -191,7 +280,8 @@ New-Item -Path . -Name 'test_results.txt' -ItemType "file" -Value "Test Results`
 # Run tests
 ExecutableTests
 
-RLibTests
+#RLibTests
+StaticCdyLibTests
 
 # CLEAN UP
 Remove-Item -LiteralPath "first_builds" -Force -Recurse
