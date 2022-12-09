@@ -1,1 +1,2 @@
-test_results.txt
+local_build_test_results.txt
+containerized_build_test_results.txt

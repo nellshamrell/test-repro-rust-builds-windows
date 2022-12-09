@@ -82,11 +82,11 @@ function ExecutableTests {
     Write-Output $PdbReproducible
 
     # Write results to file
-    "Exe Test Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
-    "Tested using https://github.com/nellshamrell/reproducible_build_basic_exp`n"  | Out-File -FilePath ..\..\test_results.txt -Append
-    "reproducible_build_basic_exp.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "reproducible_build_basic_exp.exe reproducible? ${ExeReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "reproducible_build_basic_exp.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
+    "Exe Test Results`n-------------`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "Tested using https://github.com/nellshamrell/reproducible_build_basic_exp`n"  | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "reproducible_build_basic_exp.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "reproducible_build_basic_exp.exe reproducible? ${ExeReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "reproducible_build_basic_exp.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
 
     Set-Location ../..
 }
@@ -146,10 +146,10 @@ function RLibTests {
     Write-Output $RLibReproducible
 
     # Write results to file
-    "RLib Test Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
-    "Tested using https://github.com/microsoft/windows-rs/tree/master/crates/libs/windows`n"  | Out-File -FilePath ..\..\test_results.txt -Append
-    "libwindows.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "libwindows.rlib reproducible? ${RLibReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
+    "RLib Test Results`n-------------`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "Tested using https://github.com/microsoft/windows-rs/tree/master/crates/libs/windows`n"  | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "libwindows.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "libwindows.rlib reproducible? ${RLibReproducible}`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
 
     Set-Location ../..
 }
@@ -230,14 +230,14 @@ function StaticCdyLibTests {
     $PdbReproducible = $PdbFirstBuild.Hash -eq $PdbSecondBuild.Hash
 
     # Write results to file
-    "StaticLib/Cdy LibTest Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
-    "Tested using https://github.com/rust-lang/regex/tree/b92ffd5471018419ec48dbdef32757424439f065/regex-capi"  | Out-File -FilePath ..\..\test_results.txt -Append
-    "rure.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "rure.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "rure.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "rure.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "rure.lib reproducible? ${LibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "rure.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
+    "StaticLib/Cdy LibTest Results`n-------------`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "Tested using https://github.com/rust-lang/regex/tree/b92ffd5471018419ec48dbdef32757424439f065/regex-capi"  | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "rure.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "rure.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "rure.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "rure.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "rure.lib reproducible? ${LibReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "rure.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
 
     Set-Location ../..
 }
@@ -310,13 +310,13 @@ function DyLibTests {
     $PdbReproducible = $PdbFirstBuild.Hash -eq $PdbSecondBuild.Hash
 
     # Write results to file
-    "DyLib Test Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
-    "Tested using https://github.com/AndrewGaspar/rust-plugin-example/tree/master/plugin_a"  | Out-File -FilePath ..\..\test_results.txt -Append
-    "plugin_a.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "plugin_a.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "plugin_a.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "plugin_a.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "plugin_a.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
+    "DyLib Test Results`n-------------`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "Tested using https://github.com/AndrewGaspar/rust-plugin-example/tree/master/plugin_a"  | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "plugin_a.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "plugin_a.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "plugin_a.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "plugin_a.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "plugin_a.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
 
     Set-Location ../..
 }
@@ -389,13 +389,13 @@ function ProcMacroTests {
     $PdbReproducible = $PdbFirstBuild.Hash -eq $PdbSecondBuild.Hash
 
     # Write results to file
-    "Proc-Macro Test Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
-    "Tested using https://github.com/dtolnay/proc-macro-workshop/tree/master/seq"  | Out-File -FilePath ..\..\test_results.txt -Append
-    "seq.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "seq.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "seq.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "seq.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
-    "seq.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
+    "Proc-Macro Test Results`n-------------`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "Tested using https://github.com/dtolnay/proc-macro-workshop/tree/master/seq"  | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "seq.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "seq.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "seq.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "seq.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
+    "seq.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\local_build_test_results.txt -Append
 
     Set-Location ../..
 }
@@ -412,12 +412,12 @@ mkdir second_builds
 # Check if results file already exists
 # If it does, delete it
 
-If (Test-Path -Path .\test_results.txt) {
-    Remove-Item -Path .\test_results.txt    
+If (Test-Path -Path .\local_build_test_results.txt) {
+    Remove-Item -Path .\local_build_test_results.txt    
 }
 
 # Create file to write results to
-New-Item -Path . -Name 'test_results.txt' -ItemType "file" -Value "Test Results`n`n"
+New-Item -Path . -Name 'local_build_test_results.txt' -ItemType "file" -Value "Test Results`n`n"
 
 # Run tests
 ExecutableTests
