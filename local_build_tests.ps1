@@ -217,7 +217,7 @@ function StaticCdyLibTests {
     Write-Output $LibFirstBuild.Hash
     Write-Output 'rure.lib (second build)'
     Write-Output $LibSecondBuild.Hash
-    $LibReproducible = $LibFirstBuild.Hash -eq $LibSecondBuild
+    $LibReproducible = $LibFirstBuild.Hash -eq $LibSecondBuild.Hash
 
     Write-Output 'rure.pdb (first build)'
     Write-Output $PdbFirstBuild.Hash
