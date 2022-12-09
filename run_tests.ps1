@@ -336,7 +336,86 @@ function DyLibTests {
     "plugin_a.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
 
     Set-Location ../..
+}
 
+function ProcMacroTests {
+    Write-Output '======================='
+    Write-Output 'Proc-Macro Tests'
+    Write-Output '======================='
+    Write-Output 'Testing proc-macro reproducibility using https://github.com/dtolnay/proc-macro-workshop/tree/master/seq'
+    Write-Output 'Creating first build...'
+
+    Set-Location first_builds
+    git clone https://github.com/dtolnay/proc-macro-workshop.git
+    Set-Location proc-macro-workshop
+
+    FirstBuild -AdditionalArgs "--package=seq"
+
+    $DFirstBuild = Get-FileHash .\target\release\seq.d
+    $DllFirstBuild = Get-FileHash .\target\release\seq.dll
+    $DllExpFirstBuild = Get-FileHash .\target\release\seq.dll.exp
+    $DllLibFirstBuild = Get-FileHash .\target\release\seq.dll.lib
+    $PdbFirstBuild = Get-FileHash .\target\release\seq.pdb
+
+    Write-Output ''
+    Set-Location ../../second_builds
+
+    Write-Output 'Creating second build from a different directory...'
+    git clone https://github.com/dtolnay/proc-macro-workshop.git
+    Write-Output 'Copying Cargo.lock from first build to make sure we use the same one'
+    Copy-Item ../first_builds/proc-macro-workshop/Cargo.lock proc-macro-workshop
+    Set-Location proc-macro-workshop
+ 
+    SecondBuild -AdditionalArgs "--package=seq"
+
+    Write-Output 'Getting file hashes...'
+
+    $DSecondBuild = Get-FileHash .\target\release\seq.d
+    $DllSecondBuild = Get-FileHash .\target\release\seq.dll
+    $DllExpSecondBuild = Get-FileHash .\target\release\seq.dll.exp
+    $DllLibSecondBuild = Get-FileHash .\target\release\seq.dll.lib
+    $PdbSecondBuild = Get-FileHash .\target\release\seq.pdb
+
+    Write-Output 'seq.d (first build)'
+    Write-Output $DFirstBuild.Hash
+    Write-Output 'seq.d (second build)'
+    Write-Output $DSecondBuild.Hash
+    $DReproducible = $DFirstBuild.Hash -eq $DSecondBuild.Hash
+
+    Write-Output 'seq.dll (first build)'
+    Write-Output $DllFirstBuild.Hash
+    Write-Output 'seq.dll (second build)'
+    Write-Output $DllSecondBuild.Hash
+    $DllReproducible = $DllFirstBuild.Hash -eq $DllSecondBuild.Hash
+
+    Write-Output 'seq.dll.exp (first build)'
+    Write-Output $DllExpFirstBuild.Hash
+    Write-Output 'seq.dll.exp (second build)'
+    Write-Output $DllExpSecondBuild.Hash
+    $DllExpReproducible = $DllExpFirstBuild.Hash -eq $DllExpSecondBuild.Hash
+
+    Write-Output 'seq_a.dll.lib (first build)'
+    Write-Output $DllLibFirstBuild.Hash
+    Write-Output 'seq.dll.lib (second build)'
+    Write-Output $DllLibSecondBuild.Hash
+    $DllLibReproducible = $DllLibFirstBuild.Hash -eq $DllLibSecondBuild.Hash
+
+    Write-Output 'seq.pdb (first build)'
+    Write-Output $PdbFirstBuild.Hash
+    Write-Output 'seq.pdb (second build)'
+    Write-Output $PdbSecondBuild.Hash
+    $PdbReproducible = $PdbFirstBuild.Hash -eq $PdbSecondBuild.Hash
+
+    # Write results to file
+    "Proc-Macro Test Results`n-------------`n" | Out-File -FilePath ..\..\test_results.txt -Append
+    "Tested using https://github.com/dtolnay/proc-macro-workshop/tree/master/seq"  | Out-File -FilePath ..\..\test_results.txt -Append
+    "seq.d reproducible? ${DReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "seq.dll reproducible? ${DllReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "seq.dll.exp reproducible? ${DllExpReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "seq.dll.lib reproducible? ${DllLibReproducible}" | Out-File -FilePath ..\..\test_results.txt -Append
+    "seq.pdb reproducible? ${PdbReproducible}`n" | Out-File -FilePath ..\..\test_results.txt -Append
+
+    Set-Location ../..
 }
 
 # SET UP
@@ -361,9 +440,10 @@ New-Item -Path . -Name 'test_results.txt' -ItemType "file" -Value "Test Results`
 # Run tests
 ExecutableTests
 
-#RLibTests
+RLibTests
 StaticCdyLibTests
 DyLibTests
+ProcMacroTests
 
 # CLEAN UP
 Remove-Item -LiteralPath "first_builds" -Force -Recurse
