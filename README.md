@@ -36,6 +36,22 @@ The test output will be captured in containerized_build_test_results.txt
 
 *Most outputs are reproducible when built in containers.*
 
+I use [this container image](https://hub.docker.com/repository/docker/nellshamrell/windows_rust_exp) for my tests. You can also build the image yourself using the Dockerfile in this repo.
+
+If you build the image yourself, you will need to updated the build command in these two functions:
+
+**containerized_build_tests.ps1**
+```
+function FirstBuild($AdditionalArgs) {
+    docker run --env RUSTFLAGS="--remap-path-prefix=\app=app -Clink-arg=/experimental:deterministic" --rm -v ${PWD}:C:\app -w /app nellshamrell/windows_rust_exp:0.0.2 cargo build --release $AdditionalArgs --target=x86_64-pc-windows-msvc
+}
+
+function SecondBuild($AdditionalArgs) {
+    Write-Output 'Build with locked Cargo.lock file'
+    docker run --env RUSTFLAGS="--remap-path-prefix=\app=app -Clink-arg=/experimental:deterministic" --rm -v ${PWD}:C:\app -w /app nellshamrell/windows_rust_exp:0.0.2 cargo build --release --locked $AdditionalArgs --target=x86_64-pc-windows-msvc
+}
+```
+
 ### Testing builds in locally (outside of containers)
 
 To test the builds on your local workstation (not using containers), run this script.
