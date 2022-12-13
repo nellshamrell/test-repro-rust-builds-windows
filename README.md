@@ -13,6 +13,7 @@ These scripts test for reproducibility of:
 * RLib library crates (using [windows-rs](https://github.com/microsoft/windows-rs)) 
 * Static/Cdylib library crates (using [regex](https://github.com/rust-lang/regex))
 * Dylib library crates (using [rust-plugin-example](https://github.com/AndrewGaspar/rust-plugin-example/))
+* ProcMacro library crates (using [proc-macro-workshop](https://github.com/dtolnay/proc-macro-workshop.git))
 
 ## Pre-reqs
 
